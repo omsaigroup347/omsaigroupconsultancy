@@ -1,409 +1,1083 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TechBloggerHub – Where Developers Think Out Loud</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* ─── CSS Variables ─────────────────────────────────── */
+    :root {
+      --bg:        #0a0a0f;
+      --surface:   #111118;
+      --card:      #16161f;
+      --border:    #222230;
+      --accent:    #e8ff42;
+      --accent2:   #ff6b35;
+      --accent3:   #42d4ff;
+      --text:      #f0f0f8;
+      --muted:     #7070a0;
+      --tag-bg:    #1e1e2e;
+      --font-head: 'Bebas Neue', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-sub:  'Playfair Display', serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius:    12px;
+      --gap:       2rem;
+    }
 
-<title>TechBloggerHub | Tech News, Blogging & SEO Guides</title>
+    /* ─── Reset ─────────────────────────────────────────── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display:block; max-width:100%; }
+    ul { list-style: none; }
 
-<meta name="description" content="TechBloggerHub - Learn blogging, SEO, technology and digital marketing tips.">
+    /* ─── Scrollbar ──────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 99px; }
 
-<style>
+    /* ─── Grain Overlay ──────────────────────────────────── */
+    body::before {
+      content:'';
+      position:fixed; inset:0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:9999; opacity:.4;
+    }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Segoe UI,Arial;
-}
+    /* ─── Navigation ─────────────────────────────────────── */
+    nav {
+      position: sticky; top:0; z-index:100;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 clamp(1rem,5vw,4rem);
+    }
+    .nav-inner {
+      max-width: 1300px; margin: auto;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      height: 68px; gap: 2rem;
+    }
+    .logo {
+      font-family: var(--font-head);
+      font-size: 1.8rem;
+      letter-spacing: .08em;
+      display: flex; align-items: center; gap:.5rem;
+    }
+    .logo span { color: var(--accent); }
+    .logo em {
+      font-style:normal;
+      background: var(--accent);
+      color: var(--bg);
+      padding: 1px 6px;
+      border-radius:4px;
+      font-size:.95rem;
+      font-family: var(--font-mono);
+      font-weight:600;
+    }
+    .nav-links {
+      display:flex; gap:2rem; font-size:.9rem; font-weight:500;
+    }
+    .nav-links a {
+      color: var(--muted); transition: color .2s;
+      position:relative; padding-bottom:2px;
+    }
+    .nav-links a::after {
+      content:''; position:absolute; bottom:0; left:0;
+      width:0; height:1px; background:var(--accent);
+      transition: width .25s;
+    }
+    .nav-links a:hover { color:var(--text); }
+    .nav-links a:hover::after { width:100%; }
+    .nav-actions { display:flex; gap:.8rem; align-items:center; }
+    .btn-ghost {
+      padding:.45rem 1.1rem; border:1px solid var(--border);
+      border-radius:8px; font-size:.85rem; font-weight:500;
+      color:var(--muted); cursor:pointer; background:none;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+    .btn-accent {
+      padding:.45rem 1.2rem; border-radius:8px;
+      background: var(--accent); color: var(--bg);
+      font-size:.85rem; font-weight:700; cursor:pointer;
+      border:none; transition: opacity .2s, transform .15s;
+    }
+    .btn-accent:hover { opacity:.88; transform: translateY(-1px); }
+    .hamburger {
+      display:none; flex-direction:column; gap:5px;
+      background:none; border:none; cursor:pointer; padding:4px;
+    }
+    .hamburger span {
+      display:block; width:24px; height:2px;
+      background:var(--text); border-radius:2px;
+      transition: transform .3s, opacity .3s;
+    }
+    .mobile-menu {
+      display:none; flex-direction:column; gap:1rem;
+      padding:1.2rem clamp(1rem,5vw,4rem);
+      border-top:1px solid var(--border);
+      background: var(--surface);
+    }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a { font-weight:500; color:var(--muted); font-size:.95rem; }
 
-body{
-background:#0f172a;
-color:white;
-line-height:1.6;
-}
+    /* ─── Hero ───────────────────────────────────────────── */
+    .hero {
+      max-width:1300px; margin:0 auto;
+      padding: 5rem clamp(1rem,5vw,4rem) 4rem;
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:3rem; align-items:center;
+      animation: fadeUp .7s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(28px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .hero-tag {
+      font-family: var(--font-mono); font-size:.8rem;
+      color: var(--accent); letter-spacing:.12em; text-transform:uppercase;
+      border:1px solid var(--accent); border-radius:6px;
+      display:inline-block; padding:3px 10px; margin-bottom:1.2rem;
+    }
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(3.5rem,7vw,6.5rem);
+      line-height:.95; letter-spacing:.02em;
+      margin-bottom:1.2rem;
+    }
+    .hero h1 .line2 { color: var(--accent); }
+    .hero p {
+      color:var(--muted); font-size:1.05rem;
+      max-width:480px; margin-bottom:2rem;
+    }
+    .hero-ctas { display:flex; gap:1rem; flex-wrap:wrap; }
+    .hero-visual {
+      position:relative;
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: 20px;
+      overflow:hidden;
+      min-height:360px;
+      display:flex; flex-direction:column;
+    }
+    .code-window-bar {
+      background:var(--surface);
+      border-bottom:1px solid var(--border);
+      padding:.65rem 1rem;
+      display:flex; align-items:center; gap:.5rem;
+    }
+    .dot { width:12px; height:12px; border-radius:50%; }
+    .dot-r { background:#ff5f57; }
+    .dot-y { background:#febc2e; }
+    .dot-g { background:#28c840; }
+    .code-file { font-family:var(--font-mono); font-size:.75rem; color:var(--muted); margin-left:.5rem; }
+    .code-body {
+      padding:1.4rem; font-family:var(--font-mono);
+      font-size:.78rem; line-height:1.9; flex:1;
+      overflow:hidden;
+    }
+    .c-kw  { color:#ff79c6; }
+    .c-fn  { color:#8be9fd; }
+    .c-str { color:#f1fa8c; }
+    .c-cm  { color:#6272a4; }
+    .c-nm  { color:#bd93f9; }
+    .c-op  { color:var(--accent); }
+    .hero-stats {
+      display:flex; gap:2rem;
+      border-top:1px solid var(--border);
+      padding:1rem 1.4rem;
+    }
+    .stat-item { text-align:center; }
+    .stat-num {
+      font-family:var(--font-head); font-size:1.6rem;
+      color:var(--accent); line-height:1;
+    }
+    .stat-lbl { font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
 
-/* NAV */
+    /* ─── Section wrapper ────────────────────────────────── */
+    section { max-width:1300px; margin:0 auto; padding: 4rem clamp(1rem,5vw,4rem); }
+    .section-header {
+      display:flex; align-items:baseline;
+      justify-content:space-between; margin-bottom:2.5rem;
+      flex-wrap:wrap; gap:1rem;
+    }
+    .section-title {
+      font-family:var(--font-head); font-size:clamp(2rem,4vw,2.8rem);
+      letter-spacing:.05em;
+    }
+    .section-title span { color:var(--accent); }
+    .see-all {
+      font-family:var(--font-mono); font-size:.8rem;
+      color:var(--accent); letter-spacing:.06em;
+      border-bottom:1px solid transparent;
+      transition: border-color .2s; cursor:pointer;
+    }
+    .see-all:hover { border-color:var(--accent); }
 
-nav{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:20px 8%;
-background:#020617;
-border-bottom:1px solid #1e293b;
-}
+    /* ─── Ticker ─────────────────────────────────────────── */
+    .ticker-wrap {
+      background:var(--accent); overflow:hidden;
+      padding:.45rem 0;
+    }
+    .ticker {
+      display:flex; gap:4rem;
+      animation: ticker 25s linear infinite;
+      white-space:nowrap; width:max-content;
+    }
+    .ticker-item {
+      font-family:var(--font-mono); font-size:.8rem;
+      color:var(--bg); font-weight:600;
+      letter-spacing:.06em; text-transform:uppercase;
+    }
+    .ticker-item::before { content:"▶ "; }
+    @keyframes ticker { to { transform:translateX(-50%); } }
 
-.logo{
-font-size:24px;
-font-weight:bold;
-color:#38bdf8;
-}
+    /* ─── Featured Post ──────────────────────────────────── */
+    .featured-grid {
+      display:grid; grid-template-columns:1.4fr 1fr;
+      gap: var(--gap);
+    }
+    .featured-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); overflow:hidden;
+      cursor:pointer; transition: border-color .25s, transform .25s;
+      position:relative;
+    }
+    .featured-card:hover { border-color:var(--accent); transform:translateY(-4px); }
+    .card-img {
+      width:100%; aspect-ratio:16/9;
+      background: linear-gradient(135deg,#1e1e30,#0f1a2e);
+      display:flex; align-items:center; justify-content:center;
+      font-size:5rem; user-select:none;
+      position:relative; overflow:hidden;
+    }
+    .card-img::after {
+      content:'';
+      position:absolute; inset:0;
+      background: linear-gradient(180deg,transparent 60%,var(--card) 100%);
+    }
+    .card-body { padding:1.6rem; }
+    .card-meta {
+      display:flex; align-items:center; gap:1rem;
+      margin-bottom:.8rem; flex-wrap:wrap;
+    }
+    .tag {
+      background:var(--tag-bg); border:1px solid var(--border);
+      border-radius:6px; padding:2px 10px;
+      font-size:.72rem; font-weight:600;
+      letter-spacing:.06em; text-transform:uppercase;
+      color:var(--accent3); font-family:var(--font-mono);
+    }
+    .tag.orange { color:var(--accent2); }
+    .tag.lime   { color:var(--accent); }
+    .card-date { font-size:.78rem; color:var(--muted); }
+    .card-title {
+      font-family:var(--font-sub); font-size:1.35rem;
+      line-height:1.35; margin-bottom:.75rem;
+      transition:color .2s;
+    }
+    .featured-card:hover .card-title { color:var(--accent); }
+    .card-excerpt { color:var(--muted); font-size:.9rem; margin-bottom:1.2rem; }
+    .card-author {
+      display:flex; align-items:center; gap:.65rem;
+    }
+    .avatar {
+      width:32px; height:32px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:.85rem; font-weight:700; flex-shrink:0;
+    }
+    .author-name { font-size:.82rem; font-weight:600; }
+    .author-read { font-size:.75rem; color:var(--muted); }
 
-nav ul{
-display:flex;
-gap:25px;
-list-style:none;
-}
+    /* Side cards stack */
+    .side-cards { display:flex; flex-direction:column; gap:var(--gap); }
+    .mini-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); overflow:hidden;
+      cursor:pointer; transition: border-color .25s, transform .2s;
+      display:grid; grid-template-columns:100px 1fr;
+    }
+    .mini-card:hover { border-color:var(--accent); transform:translateX(4px); }
+    .mini-thumb {
+      background:linear-gradient(135deg,#1e1e30,#0f2a1e);
+      display:flex; align-items:center; justify-content:center;
+      font-size:2.5rem;
+    }
+    .mini-body { padding:1rem 1.1rem; }
+    .mini-title {
+      font-family:var(--font-sub); font-size:1rem;
+      line-height:1.35; margin-bottom:.4rem;
+    }
+    .mini-meta { font-size:.75rem; color:var(--muted); }
 
-nav a{
-text-decoration:none;
-color:white;
-}
+    /* ─── Posts Grid ─────────────────────────────────────── */
+    .posts-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px,1fr));
+      gap:var(--gap);
+    }
+    .post-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); overflow:hidden;
+      cursor:pointer; transition:border-color .25s, transform .25s;
+      display:flex; flex-direction:column;
+    }
+    .post-card:hover { border-color:var(--accent); transform:translateY(-4px); }
+    .post-card .card-body { flex:1; display:flex; flex-direction:column; }
+    .post-card .card-excerpt { flex:1; }
+    .read-more {
+      display:inline-flex; align-items:center; gap:.4rem;
+      font-size:.82rem; font-weight:600;
+      color:var(--accent); margin-top:.8rem;
+      transition: gap .2s;
+    }
+    .post-card:hover .read-more { gap:.7rem; }
 
-/* HERO */
+    /* ─── Categories ─────────────────────────────────────── */
+    .categories-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+      gap:1.2rem;
+    }
+    .cat-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); padding:1.5rem;
+      cursor:pointer; transition:border-color .25s, transform .2s;
+      position:relative; overflow:hidden;
+    }
+    .cat-card::before {
+      content:'';
+      position:absolute; top:-40%; right:-30%;
+      width:120px; height:120px; border-radius:50%;
+      opacity:.08; transition:opacity .3s;
+    }
+    .cat-card:hover { transform:translateY(-3px); }
+    .cat-card:hover::before { opacity:.18; }
+    .cat-c1::before { background:var(--accent); }
+    .cat-c2::before { background:var(--accent2); }
+    .cat-c3::before { background:var(--accent3); }
+    .cat-c4::before { background:#a78bfa; }
+    .cat-c5::before { background:#34d399; }
+    .cat-c6::before { background:#fb7185; }
+    .cat-icon { font-size:2rem; margin-bottom:.8rem; }
+    .cat-name {
+      font-family:var(--font-head); font-size:1.15rem;
+      letter-spacing:.05em; margin-bottom:.3rem;
+    }
+    .cat-count { font-size:.78rem; color:var(--muted); font-family:var(--font-mono); }
 
-.hero{
-padding:80px 8%;
-display:grid;
-grid-template-columns:1.5fr 1fr;
-gap:40px;
-align-items:center;
-}
+    /* ─── Newsletter ─────────────────────────────────────── */
+    .newsletter {
+      max-width:1300px; margin:0 auto;
+      padding: 0 clamp(1rem,5vw,4rem) 4rem;
+    }
+    .newsletter-inner {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius:20px;
+      padding: clamp(2rem,5vw,4rem);
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:2rem; align-items:center;
+      position:relative; overflow:hidden;
+    }
+    .newsletter-inner::before {
+      content:'';
+      position:absolute; top:-80px; right:-60px;
+      width:260px; height:260px; border-radius:50%;
+      background: radial-gradient(circle, rgba(232,255,66,.15), transparent 70%);
+      pointer-events:none;
+    }
+    .nl-eyebrow {
+      font-family:var(--font-mono); font-size:.78rem;
+      color:var(--accent); letter-spacing:.1em; text-transform:uppercase;
+      margin-bottom:.8rem;
+    }
+    .nl-title {
+      font-family:var(--font-head); font-size:clamp(2rem,4vw,2.8rem);
+      line-height:1; letter-spacing:.04em; margin-bottom:.8rem;
+    }
+    .nl-title span { color:var(--accent); }
+    .nl-desc { color:var(--muted); font-size:.95rem; }
+    .nl-form { display:flex; flex-direction:column; gap:1rem; }
+    .nl-input {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:10px; padding:.85rem 1.2rem;
+      color:var(--text); font-family:var(--font-body); font-size:.95rem;
+      outline:none; transition:border-color .2s;
+      width:100%;
+    }
+    .nl-input:focus { border-color:var(--accent); }
+    .nl-input::placeholder { color:var(--muted); }
+    .nl-submit {
+      background:var(--accent); color:var(--bg);
+      border:none; border-radius:10px;
+      padding:.85rem 1.8rem; font-family:var(--font-body);
+      font-size:.95rem; font-weight:700; cursor:pointer;
+      transition:opacity .2s, transform .15s; width:100%;
+    }
+    .nl-submit:hover { opacity:.88; transform:translateY(-1px); }
+    .nl-note { font-size:.78rem; color:var(--muted); text-align:center; }
 
-.hero img{
-width:120%;
-height:300px;  
-border-radius:12px;
-}
+    /* ─── Trending ───────────────────────────────────────── */
+    .trending-list { display:flex; flex-direction:column; gap:1px; }
+    .trending-item {
+      display:grid; grid-template-columns: 56px 1fr auto;
+      align-items:center; gap:1.2rem;
+      padding:1.2rem; background:var(--card);
+      border:1px solid var(--border); cursor:pointer;
+      transition:border-color .2s, background .2s;
+      border-radius:0;
+    }
+    .trending-item:first-child { border-radius:var(--radius) var(--radius) 0 0; }
+    .trending-item:last-child  { border-radius:0 0 var(--radius) var(--radius); }
+    .trending-item:hover { border-color:var(--accent); background:var(--surface); }
+    .trend-num {
+      font-family:var(--font-head); font-size:2.5rem;
+      color:var(--border); line-height:1; text-align:center;
+      transition:color .2s;
+    }
+    .trending-item:hover .trend-num { color:var(--accent); }
+    .trend-title {
+      font-family:var(--font-sub); font-size:1.05rem; margin-bottom:.3rem;
+    }
+    .trend-meta { font-size:.78rem; color:var(--muted); }
+    .trend-arrow { font-size:1.2rem; color:var(--muted); transition:color .2s, transform .2s; }
+    .trending-item:hover .trend-arrow { color:var(--accent); transform:translateX(4px); }
 
-.hero h1{
-font-size:42px;
-margin-bottom:15px;
-}
+    /* ─── Authors ────────────────────────────────────────── */
+    .authors-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+      gap:var(--gap);
+    }
+    .author-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); padding:1.8rem;
+      text-align:center; cursor:pointer;
+      transition:border-color .25s, transform .2s;
+    }
+    .author-card:hover { border-color:var(--accent); transform:translateY(-4px); }
+    .author-av {
+      width:72px; height:72px; border-radius:50%;
+      margin:0 auto 1rem;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.8rem; font-weight:700; font-family:var(--font-head);
+      border:2px solid var(--border);
+    }
+    .author-card-name {
+      font-family:var(--font-sub); font-size:1.1rem; margin-bottom:.3rem;
+    }
+    .author-card-role { font-size:.8rem; color:var(--muted); margin-bottom:1rem; }
+    .author-stats {
+      display:flex; justify-content:center; gap:1.5rem;
+    }
+    .astat { text-align:center; }
+    .astat-n { font-family:var(--font-mono); font-size:.9rem; color:var(--accent); font-weight:600; }
+    .astat-l { font-size:.7rem; color:var(--muted); }
 
-.hero p{
-opacity:.8;
-margin-bottom:20px;
-}
+    /* ─── Footer ─────────────────────────────────────────── */
+    footer {
+      border-top:1px solid var(--border);
+      background:var(--surface);
+      margin-top: 4rem;
+    }
+    .footer-inner {
+      max-width:1300px; margin:auto;
+      padding:3rem clamp(1rem,5vw,4rem);
+      display:grid; grid-template-columns:2fr 1fr 1fr 1fr;
+      gap:2.5rem;
+    }
+    .footer-brand .logo { font-size:1.5rem; margin-bottom:1rem; }
+    .footer-desc { color:var(--muted); font-size:.88rem; margin-bottom:1.2rem; }
+    .social-links { display:flex; gap:.8rem; }
+    .social-btn {
+      width:38px; height:38px; border-radius:8px;
+      background:var(--card); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1rem; cursor:pointer;
+      transition:border-color .2s, background .2s;
+    }
+    .social-btn:hover { border-color:var(--accent); background:var(--tag-bg); }
+    .footer-col h4 {
+      font-family:var(--font-mono); font-size:.78rem;
+      color:var(--accent); letter-spacing:.1em; text-transform:uppercase;
+      margin-bottom:1.2rem;
+    }
+    .footer-col ul { display:flex; flex-direction:column; gap:.65rem; }
+    .footer-col a { color:var(--muted); font-size:.88rem; transition:color .2s; }
+    .footer-col a:hover { color:var(--text); }
+    .footer-bottom {
+      border-top:1px solid var(--border);
+      padding:1.2rem clamp(1rem,5vw,4rem);
+      max-width:1300px; margin:auto;
+      display:flex; justify-content:space-between;
+      align-items:center; flex-wrap:wrap; gap:1rem;
+    }
+    .footer-copy { font-size:.8rem; color:var(--muted); }
+    .footer-copy span { color:var(--accent); }
 
-.btn{
-display:inline-block;
-background:#38bdf8;
-color:black;
-padding:12px 20px;
-border-radius:6px;
-text-decoration:none;
-font-weight:bold;
-}
+    /* ─── Search Overlay ─────────────────────────────────── */
+    .search-overlay {
+      position:fixed; inset:0; z-index:200;
+      background:rgba(10,10,15,.95);
+      backdrop-filter:blur(12px);
+      display:none; flex-direction:column;
+      align-items:center; padding-top:8rem;
+      animation: fadeIn .2s ease;
+    }
+    .search-overlay.open { display:flex; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .search-box-wrap { width:min(640px,90vw); position:relative; }
+    .search-input {
+      width:100%; background:var(--card);
+      border:2px solid var(--accent); border-radius:14px;
+      padding:1.2rem 3.5rem 1.2rem 1.5rem;
+      font-size:1.2rem; color:var(--text);
+      font-family:var(--font-body); outline:none;
+    }
+    .search-input::placeholder { color:var(--muted); }
+    .search-close {
+      position:absolute; right:1.1rem; top:50%; transform:translateY(-50%);
+      background:none; border:none; color:var(--muted);
+      font-size:1.4rem; cursor:pointer; line-height:1;
+    }
+    .search-hints {
+      margin-top:1.2rem; display:flex; gap:.7rem; flex-wrap:wrap;
+      width:min(640px,90vw);
+    }
+    .search-hint {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:8px; padding:.35rem .9rem;
+      font-family:var(--font-mono); font-size:.78rem; color:var(--muted);
+      cursor:pointer; transition:border-color .2s, color .2s;
+    }
+    .search-hint:hover { border-color:var(--accent); color:var(--accent); }
 
-/* SECTION */
+    /* ─── Back to top ────────────────────────────────────── */
+    #back-top {
+      position:fixed; bottom:2rem; right:2rem; z-index:150;
+      width:44px; height:44px; border-radius:10px;
+      background:var(--accent); border:none;
+      color:var(--bg); font-size:1.2rem; cursor:pointer;
+      display:none; align-items:center; justify-content:center;
+      box-shadow:0 4px 20px rgba(232,255,66,.3);
+      transition:transform .2s, opacity .2s;
+    }
+    #back-top:hover { transform:translateY(-3px); }
+    #back-top.show { display:flex; }
 
-section{
-padding:70px 8%;
-}
-
-.title{
-font-size:30px;
-margin-bottom:30px;
-color:#38bdf8;
-}
-
-/* GRID */
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:25px;
-}
-
-.card{
-background:#1e293b;
-border-radius:10px;
-overflow:hidden;
-transition:.3s;
-}
-
-.card:hover{
-transform:translateY(-8px);
-}
-
-.card img{
-width:100%;
-height:160px;
-object-fit:cover;
-}
-
-.card-content{
-padding:18px;
-}
-
-.card h3{
-margin-bottom:10px;
-}
-
-.card p{
-opacity:.7;
-font-size:14px;
-}
-
-/* CATEGORY */
-
-.cat{
-display:flex;
-align-items:center;
-gap:8px;
-font-size:16px;
-padding:8px;
-}
-
-.cat i{
-color:#0073ff;
-}
-
-/* ABOUT */
-
-.about{
-max-width:800px;
-margin:auto;
-text-align:center;
-opacity:.85;
-}
-
-/* VIDEO */
-
-.video{
-max-width:800px;
-margin:auto;
-}
-
-/* NEWSLETTER */
-
-.newsletter{
-background:#020617;
-padding:60px 8%;
-text-align:center;
-}
-
-.newsletter input{
-padding:12px;
-width:250px;
-border:none;
-border-radius:6px;
-margin-right:10px;
-}
-
-.newsletter button{
-padding:12px 20px;
-border:none;
-background:#38bdf8;
-border-radius:6px;
-font-weight:bold;
-}
-
-/* FOOTER */
-
-footer{
-padding:40px 8%;
-background:#020617;
-text-align:center;
-margin-top:40px;
-}
-
-</style>
+    /* ─── Responsive ─────────────────────────────────────── */
+    @media(max-width:1024px) {
+      .featured-grid { grid-template-columns:1fr; }
+      .side-cards { flex-direction:row; }
+      .mini-card { grid-template-columns:90px 1fr; }
+    }
+    @media(max-width:768px) {
+      .hero { grid-template-columns:1fr; padding-top:3rem; }
+      .hero-visual { display:none; }
+      .nav-links, .nav-actions { display:none; }
+      .hamburger { display:flex; }
+      .side-cards { flex-direction:column; }
+      .newsletter-inner { grid-template-columns:1fr; }
+      .footer-inner { grid-template-columns:1fr 1fr; }
+    }
+    @media(max-width:480px) {
+      .footer-inner { grid-template-columns:1fr; }
+      .footer-bottom { flex-direction:column; text-align:center; }
+      .authors-grid { grid-template-columns:1fr 1fr; }
+    }
+  </style>
 </head>
-
 <body>
 
+<!-- ─── NAV ─────────────────────────────────────────────── -->
 <nav>
-
-<div class="logo">TechBloggerHub</div>
-
-<ul>
-<li><a href="#">Home</a></li>
-<li><a href="#">Tech</a></li>
-<li><a href="#">Blogging</a></li>
-<li><a href="#">SEO</a></li>
-<li><a href="#">Contact</a></li>
-</ul>
-
+  <div class="nav-inner">
+    <div class="logo">
+      <span>Tech</span>Blogger<em>Hub</em>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#featured">Featured</a></li>
+      <li><a href="#latest">Latest</a></li>
+      <li><a href="#categories">Topics</a></li>
+      <li><a href="#trending">Trending</a></li>
+      <li><a href="#authors">Authors</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn-ghost" id="search-btn">🔍 Search</button>
+      <button class="btn-accent">Write for Us</button>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#featured">Featured</a>
+    <a href="#latest">Latest</a>
+    <a href="#categories">Topics</a>
+    <a href="#trending">Trending</a>
+    <a href="#authors">Authors</a>
+  </div>
 </nav>
 
+<!-- ─── TICKER ────────────────────────────────────────────── -->
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker">
+    <span class="ticker-item">Claude 4 is Here</span>
+    <span class="ticker-item">GPT-5 Benchmarks</span>
+    <span class="ticker-item">Rust beats C++ Again</span>
+    <span class="ticker-item">WASM 3.0 Released</span>
+    <span class="ticker-item">Next.js 16 Ships</span>
+    <span class="ticker-item">Deno vs Node 2026</span>
+    <span class="ticker-item">AI in Production</span>
+    <span class="ticker-item">Zero-Day CVE Alert</span>
+    <span class="ticker-item">Web 3 Is Actually Useful Now</span>
+    <!-- duplicated for seamless loop -->
+    <span class="ticker-item">Claude 4 is Here</span>
+    <span class="ticker-item">GPT-5 Benchmarks</span>
+    <span class="ticker-item">Rust beats C++ Again</span>
+    <span class="ticker-item">WASM 3.0 Released</span>
+    <span class="ticker-item">Next.js 16 Ships</span>
+    <span class="ticker-item">Deno vs Node 2026</span>
+    <span class="ticker-item">AI in Production</span>
+    <span class="ticker-item">Zero-Day CVE Alert</span>
+    <span class="ticker-item">Web 3 Is Actually Useful Now</span>
+  </div>
+</div>
+
+<!-- ─── HERO ──────────────────────────────────────────────── -->
 <div class="hero">
+  <div class="hero-text">
+    <div class="hero-tag">// Est. 2024 · 50k+ readers</div>
+    <h1>
+      WHERE<br>
+      <span class="line2">DEVS THINK</span><br>
+      OUT LOUD.
+    </h1>
+    <p>Deep dives, hot takes, and honest tutorials from engineers who ship real code every day. No fluff, no filler.</p>
+    <div class="hero-ctas">
+      <button class="btn-accent" style="font-size:.95rem;padding:.65rem 1.6rem;" onclick="document.getElementById('latest').scrollIntoView({behavior:'smooth'})">Explore Posts ↓</button>
+      <button class="btn-ghost" style="font-size:.95rem;padding:.65rem 1.4rem;" onclick="document.getElementById('newsletter-sec').scrollIntoView({behavior:'smooth'})">Get the Newsletter</button>
+    </div>
+  </div>
 
-<div>
-
-<h1>The Future of AI in Blogging & SEO</h1>
-
-<p>
-Discover how artificial intelligence is transforming blogging,
-SEO strategies and digital marketing.
-</p>
-
-<a class="btn" href="#">Read Article</a>
-
+  <div class="hero-visual">
+    <div class="code-window-bar">
+      <span class="dot dot-r"></span>
+      <span class="dot dot-y"></span>
+      <span class="dot dot-g"></span>
+      <span class="code-file">techbloggerhub/latest.ts</span>
+    </div>
+    <div class="code-body">
+      <div><span class="c-kw">import</span> { <span class="c-fn">Blog</span> } <span class="c-kw">from</span> <span class="c-str">'@techbloggerhub/core'</span>;</div>
+      <div>&nbsp;</div>
+      <div><span class="c-kw">const</span> <span class="c-nm">hub</span> <span class="c-op">=</span> <span class="c-kw">new</span> <span class="c-fn">Blog</span>({</div>
+      <div>&nbsp; authors: <span class="c-nm">50</span><span class="c-op">+</span>,</div>
+      <div>&nbsp; posts: <span class="c-nm">1240</span><span class="c-op">+</span>,</div>
+      <div>&nbsp; topics: [<span class="c-str">'AI'</span>, <span class="c-str">'Web'</span>, <span class="c-str">'DevOps'</span>, <span class="c-str">'OSS'</span>],</div>
+      <div>&nbsp; cadence: <span class="c-str">'daily'</span>,</div>
+      <div>});</div>
+      <div>&nbsp;</div>
+      <div><span class="c-cm"> No gatekeeping. Just good tech writing.</span></div>
+      <div><span class="c-kw">await</span> <span class="c-nm">hub</span>.<span class="c-fn">publish</span>(<span class="c-nm">yourArticle</span>);</div>
+      <div>&nbsp;</div>
+      <div><span class="c-cm"> ✅ Published · 1.2k readers notified</span></div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-num">50K+</div><div class="stat-lbl">Readers</div></div>
+      <div class="stat-item"><div class="stat-num">1.2K</div><div class="stat-lbl">Articles</div></div>
+      <div class="stat-item"><div class="stat-num">50+</div><div class="stat-lbl">Authors</div></div>
+    </div>
+  </div>
 </div>
 
-<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTo1M-T2EGZ3Hk9FMTrKHvbOUcVErI8EyIEZQ&s">
+<!-- ─── FEATURED ──────────────────────────────────────────── -->
+<section id="featured">
+  <div class="section-header">
+    <h2 class="section-title">Featured <span>Posts</span></h2>
+    <span class="see-all">VIEW ALL →</span>
+  </div>
+  <div class="featured-grid">
+    <!-- Main featured -->
+    <div class="featured-card">
+      <div class="card-img">🤖</div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="tag lime">AI / ML</span>
+          <span class="card-date">Mar 16, 2026</span>
+        </div>
+        <h3 class="card-title">Building Production-Ready RAG Systems: What No Tutorial Tells You</h3>
+        <p class="card-excerpt">After shipping three RAG pipelines to production, here are the chunking strategies, re-ranking tricks, and failure modes that the blog posts skip over.</p>
+        <div class="card-author">
+          <div class="avatar" style="background:#1e2d3d;color:var(--accent3);">SK</div>
+          <div>
+            <div class="author-name">Sana Khan</div>
+            <div class="author-read">9 min read · 3.1k views</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-</div>
-
-<section>
-
-<h2 class="title">Latest Articles</h2>
-
-<div class="grid">
-
-<div class="card">
-<img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c">
-<div class="card-content">
-<h3>Best AI Tools for Bloggers</h3>
-<p>Tools that help bloggers grow faster.</p>
-</div>
-</div>
-
-<div class="card">
-<img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71">
-<div class="card-content">
-<h3>SEO Strategy for 2026</h3>
-<p>Latest ranking strategies.</p>
-</div>
-</div>
-
-<div class="card">
-<img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085">
-<div class="card-content">
-<h3>Start a Tech Blog</h3>
-<p>Beginner blogging guide.</p>
-</div>
-</div>
-
-</div>
-
+    <!-- Side mini cards -->
+    <div class="side-cards">
+      <div class="mini-card">
+        <div class="mini-thumb">⚡</div>
+        <div class="mini-body">
+          <div class="card-meta" style="margin-bottom:.5rem">
+            <span class="tag orange">Performance</span>
+            <span class="card-date">Mar 15</span>
+          </div>
+          <div class="mini-title">Why Your Next.js App Is Slow (And How to Fix It in 15 Minutes)</div>
+          <div class="mini-meta">Arjun Dev · 7 min read</div>
+        </div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-thumb" style="background:linear-gradient(135deg,#2a1e0f,#1e0f2a)">🦀</div>
+        <div class="mini-body">
+          <div class="card-meta" style="margin-bottom:.5rem">
+            <span class="tag">Systems</span>
+            <span class="card-date">Mar 14</span>
+          </div>
+          <div class="mini-title">I Rewrote My Python CLI in Rust. Here's the Brutal Honest Review</div>
+          <div class="mini-meta">Priya Nair · 12 min read</div>
+        </div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-thumb" style="background:linear-gradient(135deg,#0f1e2a,#1e2a0f)">☸️</div>
+        <div class="mini-body">
+          <div class="card-meta" style="margin-bottom:.5rem">
+            <span class="tag orange">DevOps</span>
+            <span class="card-date">Mar 13</span>
+          </div>
+          <div class="mini-title">Kubernetes Was Overkill for Us — What We Use Instead</div>
+          <div class="mini-meta">Rahul Verma · 8 min read</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section>
-
-<h2 class="title">Trending Tech</h2>
-
-<div class="grid">
-
-<div class="card">
-<img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c">
-<div class="card-content">
-<h3>Top Programming Languages</h3>
-<p>Best coding languages to learn.</p>
-</div>
-</div>
-
-<div class="card">
-<img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd">
-<div class="card-content">
-<h3>Best Laptops for Developers</h3>
-<p>Top laptops for coding.</p>
-</div>
-</div>
-
-<div class="card">
-<img src="https://images.unsplash.com/photo-1518779578993-ec3579fee39f">
-<div class="card-content">
-<h3>AI Tools Changing Blogging</h3>
-<p>AI tools bloggers should use.</p>
-</div>
-</div>
-
-</div>
-
+<!-- ─── LATEST POSTS ───────────────────────────────────────── -->
+<section id="latest">
+  <div class="section-header">
+    <h2 class="section-title">Latest <span>Articles</span></h2>
+    <span class="see-all">LOAD MORE →</span>
+  </div>
+  <div class="posts-grid" id="posts-grid">
+    <!-- Cards injected by JS -->
+  </div>
 </section>
 
-<section>
-
-<h2 class="title">Popular Guides</h2>
-
-<div class="grid">
-
-<div class="card">
-<div class="card-content">
-<h3>Complete SEO Guide</h3>
-<p>Learn SEO step-by-step.</p>
-</div>
-</div>
-
-<div class="card">
-<div class="card-content">
-<h3>Start a Blog in 2026</h3>
-<p>Beginner blogging tutorial.</p>
-</div>
-</div>
-
-<div class="card">
-<div class="card-content">
-<h3>Affiliate Marketing Guide</h3>
-<p>Make money with affiliate marketing.</p>
-</div>
-</div>
-
-</div>
-
+<!-- ─── CATEGORIES ────────────────────────────────────────── -->
+<section id="categories">
+  <div class="section-header">
+    <h2 class="section-title">Browse <span>Topics</span></h2>
+  </div>
+  <div class="categories-grid">
+    <div class="cat-card cat-c1" onclick="filterTag('AI / ML')">
+      <div class="cat-icon">🤖</div>
+      <div class="cat-name">AI / ML</div>
+      <div class="cat-count">218 articles</div>
+    </div>
+    <div class="cat-card cat-c2" onclick="filterTag('Web Dev')">
+      <div class="cat-icon">🌐</div>
+      <div class="cat-name">Web Dev</div>
+      <div class="cat-count">342 articles</div>
+    </div>
+    <div class="cat-card cat-c3" onclick="filterTag('DevOps')">
+      <div class="cat-icon">☸️</div>
+      <div class="cat-name">DevOps</div>
+      <div class="cat-count">156 articles</div>
+    </div>
+    <div class="cat-card cat-c4" onclick="filterTag('Security')">
+      <div class="cat-icon">🔐</div>
+      <div class="cat-name">Security</div>
+      <div class="cat-count">97 articles</div>
+    </div>
+    <div class="cat-card cat-c5" onclick="filterTag('Open Source')">
+      <div class="cat-icon">📦</div>
+      <div class="cat-name">Open Source</div>
+      <div class="cat-count">184 articles</div>
+    </div>
+    <div class="cat-card cat-c6" onclick="filterTag('Systems')">
+      <div class="cat-icon">⚙️</div>
+      <div class="cat-name">Systems</div>
+      <div class="cat-count">123 articles</div>
+    </div>
+    <div class="cat-card cat-c1" onclick="filterTag('Career')">
+      <div class="cat-icon">🚀</div>
+      <div class="cat-name">Career</div>
+      <div class="cat-count">88 articles</div>
+    </div>
+    <div class="cat-card cat-c2" onclick="filterTag('Databases')">
+      <div class="cat-icon">🗄️</div>
+      <div class="cat-name">Databases</div>
+      <div class="cat-count">110 articles</div>
+    </div>
+  </div>
 </section>
 
-<section>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">  
-
-<h2 class="title">Categories</h2>
-
-<div class="categories">
-
-<div class="cat"><i class="fas fa-microchip"></i> Technology</div>
-<div class="cat"><i class="fas fa-robot"></i> AI</div>
-<div class="cat"><i class="fas fa-blog"></i> Blogging</div>
-<div class="cat"><i class="fas fa-magnifying-glass-chart"></i> SEO</div>
-<div class="cat"><i class="fas fa-bullhorn"></i> Digital Marketing</div>
-
+<!-- ─── NEWSLETTER ────────────────────────────────────────── -->
+<div class="newsletter" id="newsletter-sec">
+  <div class="newsletter-inner">
+    <div>
+      <div class="nl-eyebrow">// 14,000 subscribers · weekly digest</div>
+      <h2 class="nl-title">Stay<br><span>Ahead</span><br>of the Stack.</h2>
+      <p class="nl-desc">Get the best tech articles, curated tools, and one hot take — every Friday, no spam.</p>
+    </div>
+    <div>
+      <form class="nl-form" onsubmit="handleSubscribe(event)">
+        <input class="nl-input" type="text" placeholder="Your name" id="nl-name" />
+        <input class="nl-input" type="email" placeholder="you@company.com" id="nl-email" required/>
+        <button class="nl-submit" type="submit" id="nl-btn">Subscribe Free →</button>
+        <div class="nl-note" id="nl-msg">No spam. Unsubscribe anytime.</div>
+      </form>
+    </div>
+  </div>
 </div>
 
+<!-- ─── TRENDING ──────────────────────────────────────────── -->
+<section id="trending">
+  <div class="section-header">
+    <h2 class="section-title">Trending <span>This Week</span></h2>
+    <span class="see-all">SEE ALL →</span>
+  </div>
+  <div class="trending-list" id="trending-list"></div>
 </section>
 
-<section>
-
-<h2 class="title">About TechBloggerHub</h2>
-
-<p class="about">
-
-TechBloggerHub shares the latest technology news, blogging tips,
-SEO strategies and digital marketing tutorials to help creators grow online.
-
-</p>
-
+<!-- ─── AUTHORS ───────────────────────────────────────────── -->
+<section id="authors">
+  <div class="section-header">
+    <h2 class="section-title">Meet the <span>Authors</span></h2>
+    <span class="see-all">ALL AUTHORS →</span>
+  </div>
+  <div class="authors-grid" id="authors-grid"></div>
 </section>
 
-<section>
-
-<h2 class="title">Latest Video</h2>
-
-<div class="video">
-
-<iframe width="100%" height="400"
-src="https://www.youtube.com/embed/o2TypL-NdzY?si=j0JWz2-76gNE-Ydf"
-frameborder="0"
-allowfullscreen></iframe>
-
-</div>
-
-</section>
-
-<div class="newsletter">
-
-<h2>Join Our Newsletter</h2>
-
-<p>Get the latest tech and SEO guides.</p>
-
-<br>
-
-<input placeholder="Enter your email">
-
-<button>Subscribe</button>
-
-</div>
-
+<!-- ─── FOOTER ────────────────────────────────────────────── -->
 <footer>
-
-<p>© 2026 TechBloggerHub.com</p>
-
-<p>Technology • Blogging • SEO</p>
-
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo"><span>Tech</span>Blogger<em>Hub</em></div>
+      <p class="footer-desc">Where developers think out loud. Honest writing about tech, tools, and the craft of building software.</p>
+      <div class="social-links">
+        <div class="social-btn" title="Twitter/X">𝕏</div>
+        <div class="social-btn" title="GitHub">⌨</div>
+        <div class="social-btn" title="LinkedIn">in</div>
+        <div class="social-btn" title="RSS">📡</div>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="#">Latest Articles</a></li>
+        <li><a href="#">Trending</a></li>
+        <li><a href="#">AI & ML</a></li>
+        <li><a href="#">Web Dev</a></li>
+        <li><a href="#">DevOps</a></li>
+        <li><a href="#">Security</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Community</h4>
+      <ul>
+        <li><a href="#">Write for Us</a></li>
+        <li><a href="#">Authors</a></li>
+        <li><a href="#">Newsletter</a></li>
+        <li><a href="#">Discord Server</a></li>
+        <li><a href="#">Podcast</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Advertise</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 <span>TechBloggerHub</span> · Built with ❤️ by developers, for developers.</div>
+    <div class="footer-copy">Made in 🇮🇳 India</div>
+  </div>
 </footer>
 
+<!-- ─── BACK TO TOP ───────────────────────────────────────── -->
+<button id="back-top" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ─── SEARCH OVERLAY ────────────────────────────────────── -->
+<div class="search-overlay" id="search-overlay">
+  <div class="search-box-wrap">
+    <input class="search-input" id="search-input" type="text" placeholder="Search articles, topics, authors…"/>
+    <button class="search-close" onclick="closeSearch()">✕</button>
+  </div>
+  <div class="search-hints">
+    <span class="search-hint" onclick="setSearch('RAG Systems')">RAG Systems</span>
+    <span class="search-hint" onclick="setSearch('Rust vs Go')">Rust vs Go</span>
+    <span class="search-hint" onclick="setSearch('TypeScript tips')">TypeScript tips</span>
+    <span class="search-hint" onclick="setSearch('Docker best practices')">Docker best practices</span>
+    <span class="search-hint" onclick="setSearch('LLM fine-tuning')">LLM fine-tuning</span>
+    <span class="search-hint" onclick="setSearch('PostgreSQL tuning')">PostgreSQL tuning</span>
+  </div>
+</div>
+
+<!-- ─── JAVASCRIPT ────────────────────────────────────────── -->
+<script>
+/* ── Data ───────────────────────────────────────────────── */
+const posts = [
+  { emoji:'🧠', tag:'AI / ML',     tagClass:'lime',   date:'Mar 17, 2026', title:'Fine-Tuning LLMs on a Budget: A Practical Guide for Startups', excerpt:'You don\'t need 8 H100s. Here\'s how we fine-tuned a 7B model for $40 using QLoRA and a weekend.', author:'Aditya Rao', av:'AR', avBg:'#1e2d1e', avColor:'var(--accent)', read:'11 min' },
+  { emoji:'⚡', tag:'Performance',  tagClass:'orange',  date:'Mar 16, 2026', title:'The Hidden Cost of useMemo: When React Optimization Backfires', excerpt:'Profiling 12 production React apps revealed one common anti-pattern that\'s slowing everyone down.', author:'Meera Singh', av:'MS', avBg:'#2d1e1e', avColor:'#fb7185', read:'7 min' },
+  { emoji:'🔐', tag:'Security',    tagClass:'',        date:'Mar 15, 2026', title:'JWT vs Sessions in 2026: Which Should You Actually Use?', excerpt:'A security-first breakdown of both approaches, with real attack scenarios and migration stories.', author:'Karan Mehta', av:'KM', avBg:'#1e1e2d', avColor:'var(--accent3)', read:'9 min' },
+  { emoji:'📦', tag:'Open Source', tagClass:'lime',   date:'Mar 14, 2026', title:'I Maintain an OSS Project with 8k Stars. Here\'s What I Wish I Knew', excerpt:'Burnout, toxic issues, release anxiety — and the few things that actually make it sustainable.', author:'Divya Patel', av:'DP', avBg:'#2d2a1e', avColor:'#fbbf24', read:'14 min' },
+  { emoji:'🗄️', tag:'Databases',  tagClass:'orange',  date:'Mar 13, 2026', title:'PostgreSQL Query Planner Secrets: 8 Tricks Your ORM Hides From You', excerpt:'Raw SQL and EXPLAIN ANALYZE are your best friends. Here\'s what every backend dev should know.', author:'Vikram Joshi', av:'VJ', avBg:'#1e2a1e', avColor:'#34d399', read:'10 min' },
+  { emoji:'☁️', tag:'DevOps',      tagClass:'',        date:'Mar 12, 2026', title:'Fly.io vs Railway vs Render: The Honest 2026 Comparison', excerpt:'We deployed the same app to all three. Here\'s the real cost, DX, and gotchas after 3 months.', author:'Sneha Gupta', av:'SG', avBg:'#2d1e2d', avColor:'#a78bfa', read:'8 min' },
+];
+
+const trending = [
+  { title:'Why I Switched From VS Code to Zed and Never Looked Back', meta:'22k views · 6 min read · Mar 11, 2026' },
+  { title:'HTMX Is Not a Joke: We Replaced React With It in Production', meta:'19k views · 9 min read · Mar 10, 2026' },
+  { title:'The Leetcode Grind Is Dead. Here\'s What Actually Gets You Hired', meta:'17k views · 5 min read · Mar 9, 2026' },
+  { title:'I Analyzed 500 Developer Resumes. Here\'s What\'s Killing Your Chances', meta:'14k views · 7 min read · Mar 8, 2026' },
+  { title:'Bun 2.0 vs Node.js vs Deno: The Definitive 2026 Benchmark', meta:'12k views · 11 min read · Mar 7, 2026' },
+];
+
+const authors = [
+  { name:'Sana Khan',   role:'ML Engineer @ Anthropic',  av:'SK', bg:'#1e2d3d', color:'var(--accent3)', posts:48, followers:'12.3k' },
+  { name:'Arjun Dev',   role:'Frontend Architect',        av:'AD', bg:'#2d1e1e', color:'#fb7185',        posts:61, followers:'9.1k' },
+  { name:'Priya Nair',  role:'Systems Programmer',        av:'PN', bg:'#2d2a1e', color:'#fbbf24',        posts:33, followers:'7.8k' },
+  { name:'Vikram Joshi',role:'Principal DBA @ Flipkart',  av:'VJ', bg:'#1e2a1e', color:'#34d399',        posts:55, followers:'11.2k' },
+];
+
+/* ── Render Posts ────────────────────────────────────────── */
+function renderPosts(list) {
+  const grid = document.getElementById('posts-grid');
+  grid.innerHTML = list.map(p => `
+    <div class="post-card" onclick="this.style.borderColor='var(--accent)'">
+      <div class="card-img" style="aspect-ratio:16/9;font-size:3.5rem">${p.emoji}</div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="tag ${p.tagClass}">${p.tag}</span>
+          <span class="card-date">${p.date}</span>
+        </div>
+        <h3 class="card-title" style="font-size:1.1rem">${p.title}</h3>
+        <p class="card-excerpt" style="font-size:.85rem">${p.excerpt}</p>
+        <div class="card-author" style="margin-top:auto;padding-top:.8rem;border-top:1px solid var(--border)">
+          <div class="avatar" style="background:${p.avBg};color:${p.avColor};font-size:.7rem">${p.av}</div>
+          <div>
+            <div class="author-name">${p.author}</div>
+            <div class="author-read">${p.read} read</div>
+          </div>
+          <span class="read-more" style="margin-left:auto">Read →</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Render Trending ────────────────────────────────────── */
+function renderTrending() {
+  document.getElementById('trending-list').innerHTML = trending.map((t,i) => `
+    <div class="trending-item">
+      <div class="trend-num">0${i+1}</div>
+      <div>
+        <div class="trend-title">${t.title}</div>
+        <div class="trend-meta">${t.meta}</div>
+      </div>
+      <div class="trend-arrow">→</div>
+    </div>
+  `).join('');
+}
+
+/* ── Render Authors ─────────────────────────────────────── */
+function renderAuthors() {
+  document.getElementById('authors-grid').innerHTML = authors.map(a => `
+    <div class="author-card">
+      <div class="author-av" style="background:${a.bg};color:${a.color}">${a.av}</div>
+      <div class="author-card-name">${a.name}</div>
+      <div class="author-card-role">${a.role}</div>
+      <div class="author-stats">
+        <div class="astat"><div class="astat-n">${a.posts}</div><div class="astat-l">Posts</div></div>
+        <div class="astat"><div class="astat-n">${a.followers}</div><div class="astat-l">Followers</div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Filter by tag ─────────────────────────────────────── */
+function filterTag(tag) {
+  const filtered = posts.filter(p => p.tag === tag);
+  renderPosts(filtered.length ? filtered : posts);
+  document.getElementById('latest').scrollIntoView({behavior:'smooth'});
+}
+
+/* ── Search ────────────────────────────────────────────── */
+document.getElementById('search-btn').onclick = () => {
+  document.getElementById('search-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('search-input').focus(), 100);
+};
+function closeSearch() {
+  document.getElementById('search-overlay').classList.remove('open');
+}
+function setSearch(val) {
+  document.getElementById('search-input').value = val;
+}
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeSearch();
+});
+document.getElementById('search-overlay').addEventListener('click', e => {
+  if(e.target.id === 'search-overlay') closeSearch();
+});
+
+/* ── Newsletter ────────────────────────────────────────── */
+function handleSubscribe(e) {
+  e.preventDefault();
+  const btn = document.getElementById('nl-btn');
+  const msg = document.getElementById('nl-msg');
+  btn.textContent = '✓ You\'re in!';
+  btn.style.background = '#34d399';
+  btn.style.color = '#fff';
+  msg.textContent = '🎉 Welcome aboard! Check your inbox for a confirmation.';
+  msg.style.color = '#34d399';
+  btn.disabled = true;
+}
+
+/* ── Mobile Menu ───────────────────────────────────────── */
+document.getElementById('hamburger').onclick = function() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+};
+
+/* ── Back to Top ───────────────────────────────────────── */
+window.addEventListener('scroll', () => {
+  document.getElementById('back-top').classList.toggle('show', window.scrollY > 400);
+});
+
+/* ── Intersection animations ───────────────────────────── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(el => {
+    if(el.isIntersecting) {
+      el.target.style.animation = 'fadeUp .5s ease both';
+      observer.unobserve(el.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+/* ── Init ──────────────────────────────────────────────── */
+renderPosts(posts);
+renderTrending();
+renderAuthors();
+document.querySelectorAll('.featured-card, .post-card, .cat-card, .author-card, .trending-item, .mini-card').forEach(el => observer.observe(el));
+</script>
 </body>
 </html>
